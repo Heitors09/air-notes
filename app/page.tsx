@@ -1,103 +1,159 @@
-import Image from "next/image";
+"use client";
+
+import { AuroraText } from "@/components/magicui/aurora-text";
+import { GridBeams } from "@/components/magicui/grid-beams";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ArrowRightIcon, ChevronDown, Star } from "lucide-react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { CardNote } from "./components/card-edit/card-note";
+import { CreateNote } from "./components/create-note/create-note";
+import { Footer } from "./components/homepage/footer";
+import { SearchBar } from "./components/homepage/search-bar";
+import { NoteContext } from "./components/wrapper/app-wrapper";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+	const mainRef = useRef<HTMLDivElement>(null);
+	const [showIndicator, setShowIndicator] = useState(false);
+	// biome-ignore lint/style/noNonNullAssertion: <explanation>
+	const note = useContext(NoteContext)!;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+	useEffect(() => {
+		const indicator = mainRef.current;
+		if (!indicator) return;
+
+		const handleScroll = () => {
+			const atBottom =
+				indicator.scrollTop + indicator.clientHeight >=
+				indicator.scrollHeight - 2;
+			setShowIndicator(!atBottom);
+		};
+
+		if (note.notes.length > 5) {
+			setShowIndicator(true);
+			indicator.addEventListener("scroll", handleScroll);
+		}
+
+		return () => {
+			indicator.removeEventListener("scroll", handleScroll);
+		};
+	}, [note.notes]);
+
+	const searchTyped = note.searchTyped;
+
+	const filteredNotes =
+		searchTyped && searchTyped.length > 0
+			? note.notes.filter(
+					(n) =>
+						n.title.toLowerCase().includes(searchTyped) ||
+						(n.description?.toLowerCase().includes(searchTyped) ?? false),
+				)
+			: note.notes;
+
+	return (
+		<>
+			<GridBeams className="text-white  min-h-screen py-24  flex flex-col items-center">
+				<div className="flex items-center max-md:px-12 gap-4 flex-col">
+					<div className="z-10 flex   items-center justify-center">
+						<motion.div
+							variants={{
+								hidden: { opacity: 0 },
+								show: { opacity: 1 },
+							}}
+							initial="hidden"
+							animate="show"
+							transition={{ duration: 0.05 }}
+						>
+							<div
+								className={cn(
+									"group  flex items-center gap-3 rounded-full border border-white/10 bg-gradient-to-r from-white/10 to-white/5 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/20 hover:shadow-white/20 cursor-pointer",
+								)}
+							>
+								<span className="flex text-xs items-center gap-2">
+									<div className="flex items-center gap-1">
+										<Star className="size-4 text-white drop-shadow" />
+										<span className="font-semibold">3</span>
+									</div>
+									<div className="h-3 w-px bg-white/40" />
+									<span className="opacity-90">Stars on GitHub</span>
+								</span>
+								<ArrowRightIcon className="size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-1" />
+							</div>
+						</motion.div>
+					</div>
+					<motion.div
+						className="flex w-full items-center flex-col gap-4"
+						variants={{
+							hidden: { opacity: 0 },
+							show: { opacity: 1 },
+						}}
+						initial="hidden"
+						animate="show"
+						transition={{ duration: 0.05 }}
+					>
+						<h2 className="md:text-5xl sm:text-4xl text-xl  duration-300 ease-out cursor-pointer text-center sm:max-w-[700px] font-bold">
+							Deixe <AuroraText speed={2}>AirNote</AuroraText> ajudar você a
+							liberar sua mente.
+						</h2>
+						<p className="sm:text-sm text-xs duration-300 ease-out cursor-pointer text-center sm:max-w-[650px]">
+							<AuroraText speed={2}>
+								Capture seus pensamentos em um instante.
+							</AuroraText>{" "}
+							O AirNote mantém tudo seguro, organizado e fácil de revisitar
+							quando quiser, melhore seu foco se livrando de ruídos.
+						</p>
+						<SearchBar />
+					</motion.div>
+				</div>
+				<main ref={mainRef} className="overflow-y-scroll max-md:px-4 px-3">
+					<motion.div
+						className=" max-h-[550px] md:grid flex flex-col max-md:items-center  md:grid-cols-3  p-1  gap-3 flex  max-w-[890px]   "
+						variants={{
+							show: {
+								transition: {
+									staggerChildren: 0.15,
+								},
+							},
+						}}
+						initial="hidden"
+						animate="show"
+					>
+						<motion.div
+							variants={{
+								hidden: { opacity: 0, y: 20 },
+								show: { opacity: 1, y: 0 },
+							}}
+						>
+							<CreateNote />
+						</motion.div>
+						{/* biome-ignore lint/suspicious/noExplicitAny: <explanation> */}
+						{filteredNotes.map((noteData: any) => (
+							<motion.div
+								key={noteData.id}
+								variants={{
+									hidden: { opacity: 0, y: 20 },
+									show: { opacity: 1, y: 0 },
+								}}
+							>
+								<CardNote setNote={note.setNotes} note={noteData} />
+							</motion.div>
+						))}
+
+						{showIndicator && (
+							<div className="pointer-events-none absolute bottom-80  flex w-full justify-center">
+								<div className="relative flex py-2 flex-col w-full max-w-[890px] items-center justify-center h-16">
+									{/* Sombra suave */}
+									<div className="absolute inset-0  to-transparent" />
+									{/* Ícone */}
+									<ChevronDown className="relative  text-white/80 z-10 animate-bounce " />
+									<p className="text-xs">use o Scroll para ver mais.</p>
+								</div>
+							</div>
+						)}
+					</motion.div>
+				</main>
+				<Footer />
+			</GridBeams>
+		</>
+	);
 }
