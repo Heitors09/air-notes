@@ -3,8 +3,8 @@
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { GridBeams } from "@/components/magicui/grid-beams";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { ArrowRightIcon, ChevronDown, Star } from "lucide-react";
+import { motion } from "motion/react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { CardNote } from "./components/card-edit/card-note";
 import { CreateNote } from "./components/create-note/create-note";
