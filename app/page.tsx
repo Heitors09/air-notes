@@ -5,6 +5,7 @@ import { GridBeams } from "@/components/magicui/grid-beams";
 import { cn } from "@/lib/utils";
 import { ArrowRightIcon, ChevronDown, Star } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useContext, useEffect, useRef, useState } from "react";
 import { CardNote } from "./components/card-edit/card-note";
 import { CreateNote } from "./components/create-note/create-note";
@@ -69,14 +70,13 @@ export default function Home() {
 									"group  flex items-center gap-3 rounded-full border border-white/10 bg-gradient-to-r from-white/10 to-white/5 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/20 hover:shadow-white/20 cursor-pointer",
 								)}
 							>
-								<span className="flex text-xs items-center gap-2">
-									<div className="flex items-center gap-1">
-										<Star className="size-4 text-white drop-shadow" />
-										<span className="font-semibold">3</span>
-									</div>
-									<div className="h-3 w-px bg-white/40" />
-									<span className="opacity-90">Stars on GitHub</span>
-								</span>
+								<Link
+									href={"https://github.com/Heitors09/air-notes"}
+									className="flex text-xs items-center gap-2"
+								>
+									<Star className="size-4" />
+									<span className="opacity-90">Dê uma estrela no GitHub</span>
+								</Link>
 								<ArrowRightIcon className="size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-1" />
 							</div>
 						</motion.div>
@@ -92,7 +92,7 @@ export default function Home() {
 						transition={{ duration: 0.05 }}
 					>
 						<h2 className="md:text-5xl sm:text-4xl text-xl  duration-300 ease-out cursor-pointer text-center sm:max-w-[700px] font-bold">
-							Deixe <AuroraText speed={2}>AirNote</AuroraText> ajudar você a
+							Deixe <AuroraText speed={2}>AirNotes</AuroraText> ajudar você a
 							liberar sua mente.
 						</h2>
 						<p className="sm:text-sm text-xs duration-300 ease-out cursor-pointer text-center sm:max-w-[650px]">
